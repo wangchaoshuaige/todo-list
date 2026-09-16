@@ -43,8 +43,9 @@ function addTask(){let v=document.getElementById('task').value.trim();let dueDat
 function toggle(i){tasks[i].done=!tasks[i].done;save()}
 function removeTask(i){tasks.splice(i,1);save()}
 function escapeHTML(value){return value.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}
-function dueDateClass(dueDate){if(!dueDate)return'';let today=new Date().toISOString().slice(0,10);if(dueDate<today)return' overdue';if(dueDate===today)return' due-today';return''}
-function dueDateLabel(dueDate){return dueDate?`<small class="due-date${dueDateClass(dueDate)}">截止：${dueDate}</small>`:''}
+function todayString(){let now=new Date();let month=String(now.getMonth()+1).padStart(2,'0');let day=String(now.getDate()).padStart(2,'0');return `${now.getFullYear()}-${month}-${day}`}
+function dueDateClass(dueDate){if(!dueDate)return'';let today=todayString();if(dueDate<today)return' overdue';if(dueDate===today)return' due-today';return''}
+function dueDateLabel(dueDate){if(!dueDate)return'';let isOverdue=dueDateClass(dueDate).includes('overdue');return `<small class="due-date${dueDateClass(dueDate)}">截止：${dueDate}${isOverdue?'（已过期）':''}</small>`}
 function render(){let ul=document.getElementById('list');ul.innerHTML='';tasks.forEach((t,i)=>{let li=document.createElement('li');if(t.done)li.className='done';li.innerHTML=`<div class="task-content"><span class="task-text" onclick="toggle(${i})">${escapeHTML(t.text)}</span>${dueDateLabel(t.dueDate)}</div><button class="delete" onclick="removeTask(${i})">删除</button>`;ul.appendChild(li)});document.getElementById('count').innerText=`共 ${tasks.length} 项，完成 ${tasks.filter(t=>t.done).length} 项`}
 render();
 </script>

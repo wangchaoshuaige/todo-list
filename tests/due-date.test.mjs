@@ -23,7 +23,19 @@ const elements = {
 };
 
 const storage = new Map();
+const RealDate = Date;
+class FixedDate extends RealDate {
+  constructor(...args) {
+    super(...(args.length ? args : ["2026-09-16T12:00:00"]));
+  }
+
+  static now() {
+    return new RealDate("2026-09-16T12:00:00").getTime();
+  }
+}
+
 const sandbox = {
+  Date: FixedDate,
   localStorage: {
     getItem(key) {
       return storage.has(key) ? storage.get(key) : null;
@@ -54,3 +66,14 @@ assert.deepEqual(savedTasks[0], {
   dueDate: "2026-09-20"
 });
 assert.equal(elements.dueDate.value, "", "deadline input is cleared after adding a task");
+
+assert.match(
+  sandbox.dueDateLabel("2026-09-15"),
+  /已过期/,
+  "overdue tasks show an overdue warning"
+);
+assert.match(
+  sandbox.dueDateLabel("2026-09-15"),
+  /class="due-date overdue"/,
+  "overdue tasks use the overdue warning class"
+);
